@@ -1,4 +1,4 @@
-#Heart Attack Prediction Using Supervised Machine Learning#
+**Heart Attack Prediction Using Supervised Machine Learning**
 
 important=>zip file contains all files of the project video and html files of the visualizations plots.
 This project focuses on building a supervised machine learning model to predict the likelihood of a heart attack based on various health-related parameters. The objective is to analyze the dataset, preprocess it, and train a predictive model to assist healthcare professionals in early detection and prevention of heart attacks.
