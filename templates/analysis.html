@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Attack Analysis Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        function submitForm(formId) {
+            document.getElementById(formId).submit();
+        }
+        function showSection(sectionId) {
+            
+            if (sectionId === 'prediction') {
+                // Redirect to the analysis page
+                window.location.href = "{{ url_for('prediction') }}";
+            } else {
+                // Show other sections 
+                const sections = document.querySelectorAll('.content, .prediction');
+                sections.forEach(section => section.classList.add('hidden'));
+                document.getElementById(sectionId).classList.remove('hidden');
+            }
+        }
+    </script>
+    <style>
+        /* styles.css */
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+   
+        input::placeholder {
+        color: lightgray;
+        }
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #444;
+            padding: 1em 2em;
+            height: 70px;
+        }
+        .navbar-title {
+            color: white;
+            margin: 0;
+            padding-right: 20px;
+            font: 3em sans-serif;
+            font-weight: bold;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.8em;
+            padding: 0.3em 2em;
+            font-weight: bold;
+        }
+        .navbar a:hover {
+            background-color: #575757;
+            border-radius: 5px;
+        }
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+        .plots {
+            display:flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            width: 90;
+            gap: 100px;
+        }
+        .plot {
+            flex: 1 1 30%;
+            margin-right: 10px;
+            width: 100%;
+            border-radius: 10px;
+            padding: auto;
+            
+        }
+        .boxplot {
+        width: 200px;
+        height: 200px;
+        }
+        .attribute-select {
+            width: 100%;
+            margin-bottom: 10px;
+            border-radius: 12px;
+        }
+        .analysis {
+            display: flex;
+            flex-wrap: wrap; 
+        }
+        .correlation, .line-plot {
+            flex-grow: 0.5;
+        }
+        .line-plot {
+            flex-grow: 2;
+        }
+        #boxPlot, #histogram, #countPlot, #correlationMatrix, #linePlot {
+            
+            height: 470px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: #444;
+        }
+    </style>
+</head>
+<body>
+    <!-- ?\navigation bar -->
+    <div class="navbar">
+        <div class="navbar-title">Heart Attack</div>
+        <div class="nav-links">
+            <a href="#prediction" onclick="showSection('prediction')">Prediction</a>
+            <a href="#analysis" onclick="showSection('analysis')">Analysis</a>
+        </div>
+    </div>
+    <!-- code of boxPlot , combo box and its content  -->
+    <div class="container">
+        <form id="attributeForm" action="/analysis" method="POST">
+            <div class="plots">
+                <div class="plot">
+                    <select id="boxPlotSelect" name="attribute" class="attribute-select" onchange="submitForm('attributeForm')">
+                        <p>
+                            <option value="" disabled selected style="color: lightgray;" class="placeholder">Select Feature</option>
+                            </p>
+                        <option value="age"{% if selected_attribute == 'age' %} selected{% endif %}>Age</option>
+                        <option value="chol"{% if selected_attribute == 'chol' %} selected{% endif %}>Cholesterol</option>
+                        <option value="oldpeak"{% if selected_attribute == 'oldpeak' %} selected{% endif %}>Oldpeak</option>
+                        <option value="thalach"{% if selected_attribute == 'thalach' %} selected{% endif %}>Thalach</option>
+                        <option value="trestbps"{% if selected_attribute == 'trestbps' %} selected{% endif %}>Trestbps</option>
+                    </select>
+                    <div id="boxPlot"> 
+                        {% if selected_attribute %}
+                            <iframe src="{{ box_plot_files[selected_attribute] }}" style="width:100%; height:600px; border:none;"></iframe>   
+                        {% endif %}
+                    </div>
+                </div>
+        </form>
+        <!-- code of histogram , combo box and its content , form to pass it's id to session to listen -->
+        <form id="hattributeForm" action="/analysis" method="POST">
+                <div class="plot">
+                    <select id="histogramSelect" name="histogram_attribute" class="attribute-select" onchange="submitForm('hattributeForm')">
+                        <p>
+                        <option value="" disabled selected style="color: lightgray;" class="placeholder">Select Feature</option>
+                        </p>
+                        <option value="age"{% if selected_histogram_attribute == 'age' %} selected{% endif %}>Age</option>
+                        <option value="chol"{% if selected_histogram_attribute == 'chol' %} selected{% endif %}>Cholesterol</option>
+                        <option value="oldpeak"{% if selected_histogram_attribute == 'oldpeak' %} selected{% endif %}>Oldpeak</option>
+                        <option value="thalach"{% if selected_histogram_attribute == 'thalach' %} selected{% endif %}>Thalach</ont>
+                        <option value="trestbps"{% if selected_histogram_attribute == 'trestbps' %} selected{% endif %}>Trestbps</option>
+                    </select>
+                    <div class="histogram">
+                        <div id="histogram">
+                            {% if selected_histogram_attribute %}
+                                <iframe src="{{ histogram_files[selected_histogram_attribute] }}" style="width:100%; height:600px; border:none;"></iframe>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+        </form>
+        <!-- code of boxPlot , countPlot and its content  -->
+        <form id="cattributeForm" action="/analysis" method="POST">
+                <div class="plot">
+                    <select id="countPlotSelect" name="categorical_attribute" class="attribute-select" onchange="submitForm('cattributeForm')">
+                        <p>
+                        <option value="" disabled selected style="color: lightgray;" class="placeholder">Select Feature</option>
+                        </p>
+                        <option value="sex"{% if selected_cattribute == 'sex' %} selected{% endif %}>Sex</option>
+                        <option value="exang"{% if selected_cattribute == 'exang' %} selected{% endif %}>Exang</option>
+                        <option value="ca"{% if selected_cattribute == 'ca' %} selected{% endif %}>CA</option>
+                        <option value="cp"{% if selected_cattribute == 'cp' %} selected{% endif %}>CP</option>
+                        <option value="fbs"{% if selected_cattribute == 'fbs' %} selected{% endif %}>FBS</option>
+                        <option value="restecg"{% if selected_cattribute == 'restecg' %} selected{% endif %}>Restecg</option>
+                        <option value="slope"{% if selected_cattribute == 'slope' %} selected{% endif %}>Slope</option>
+                        <option value="thal"{% if selected_cattribute == 'thal' %} selected{% endif %}>Thal</option>
+                    </select>
+                    <div class="countPlot">
+                        <div id="countPlot">
+                            {% if selected_cattribute %}
+                                <iframe src="{{ categorical_count_files[selected_cattribute] }}" style="width:100%; height:600px; border:none;"></iframe>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+        <form>
+     </div>
+         <!-- code of correlation,line_plot , countPlot and its content  -->
+     <div class="analysis">
+        <div class="correlation">
+            <div id="correlationMatrix">
+                <iframe src="{{ correlation_file }}" style="width:100%; height:1000px; border:none;"></iframe>
+            </div>
+        </div>
+        <div class="line-plot">
+            <div id="linePlot">
+                <iframe src="{{ bar_plot_file }}" style="width:100%; height:600px; border:none;"></iframe>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
