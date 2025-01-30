@@ -7,8 +7,7 @@ import pickle
 # Ensuring the static/plots directory exists
 os.makedirs('static/plots', exist_ok=True)
 
-app = Flask(__name__)
-app.secret_key = 'your_secret_key'  
+app = Flask(__name__)  
 
 # Loading the trained models
 models = {
