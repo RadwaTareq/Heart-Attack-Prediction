@@ -1,14 +1,16 @@
 from flask import Flask, render_template, request, session
 import os
 import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend for rendering plots
+matplotlib.use('Agg') 
 import pandas as pd
 import pickle
+# Ensuring the static/plots directory exists
+os.makedirs('static/plots', exist_ok=True)
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # Needed for session management
+app.secret_key = 'your_secret_key'  
 
-# Load your trained models
+# Loading the trained models
 models = {
     'Random Forest': pickle.load(open('RFmodel.pkl', 'rb')),
     'SVM': pickle.load(open('SVMmodel.pkl', 'rb')),
@@ -22,8 +24,6 @@ def predict_single_row(model, row):
     prediction = model.predict(row_df)
     return int(prediction[0])
 
-# Ensure the static/plots directory exists
-os.makedirs('static/plots', exist_ok=True)
 
 @app.route('/', methods=['GET', 'POST'])
 def prediction():
